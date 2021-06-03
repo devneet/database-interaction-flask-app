@@ -1,0 +1,227 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Data From Table Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/05cd9c4554.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='/icons/db-icon.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+      </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/create_table/">Create Table</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_single_record/">Insert Single Record</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_multiple_records/">Bulk Insert</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/update_table/">Update Record</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/download_data/">Download Records</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Delete Data From Table Form - {{db_type}}</h1>
+            <p class="lead">The data deletion form for MySQL database.</p>
+        </div>
+    </div>
+    <form method="POST" action="/delete_data_from_table/" class="container row g-3 needs-validation">
+            <div class="form-group col-md-6 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="username" name ="username" aria-describedby="usernameHelp" placeholder="Enter username" required>
+                <label for="username" class="fw-light">Username</label>
+                <small id="usernameHelp" class="form-text text-muted">The username required to connect to MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the username.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password" aria-describedby="passwordHelp" required>
+                <label for="password" class="fw-light">Password</label>
+                <small id="passwordHelp" class="form-text text-muted">The password required to connect to MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the password.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="dbName" name ="database_name" aria-describedby="dbNameHelp" placeholder="Enter database name" required>
+                <label for="dbName" class="fw-light">Database Name</label>
+                <small id="dbNameHelp" class="form-text text-muted">The MySQL database to connect to.</small>
+                <div class="invalid-feedback">
+                    Please choose the database name.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="tableName" name="table_name" aria-describedby="tableNameHelp" placeholder="Enter database name" required>
+                <label for="tableName" class="fw-light">Table Name</label>
+                <small id="tableNameHelp" class="form-text text-muted">The name of the table to in the MySQL database from where the data will be deleted.</small>
+                <div class="invalid-feedback">
+                    Please choose the table name.
+                </div>
+            </div>
+        <div class="col-lg-15">
+            <button id="addCondition" type="button" class="btn btn-dark fas fa-plus col-lg-2"> Add Condition</button>
+        </div>
+        <div class="col-lg-15">
+                <button id="submit" type="submit" class="btn btn-dark fas fa-minus-circle col-md-2">  Delete Data</button>
+        </div>
+
+        <div class="container" id = "newRow"></div>
+
+        <div id = "status" class="alert alert-dark" role="alert">
+        </div>
+
+    </form>
+
+<script type="text/javascript">
+
+    let result = {{ status | tojson }};
+    if (result[0] === true){
+
+        document.getElementById("status").style.display = "block";
+
+        if (result[1] === 'SUCCESS'){
+
+            document.getElementById("status").className = "alert alert-success"
+
+        }else{
+
+            document.getElementById("status").className = "alert alert-danger"
+
+        }
+
+        document.getElementById("status").innerHTML = result[2];
+    }
+    else{
+
+        document.getElementById("status").style.display = "none";
+
+    }
+
+    // add row
+    if (result[0] === true){
+
+        document.getElementById("status").style.display = "block";
+
+        if (result[1] === 'SUCCESS'){
+
+            document.getElementById("status").className = "alert alert-success"
+
+        }else{
+
+            document.getElementById("status").className = "alert alert-danger"
+
+        }
+
+        document.getElementById("status").innerHTML = result[2];
+    }
+    else{
+
+        document.getElementById("status").style.display = "none";
+
+    }
+
+    // add row
+    var count = 1
+    $("#addCondition").click(function () {
+        if (count == 1){
+                    var html = '<div class="jumbotron jumbotron-fluid"><div class="container"><h3>Conditional Fields</h6><p class="lead">The field conditions to be checked while deleting.</p></div></div>';
+                html += '<br>';
+                }else {
+                    var html = '<br>';
+                }
+
+        html += '<div id="inputFormRow" class="row">';
+
+        html += '<div class="col-auto">';
+        html += '<input type="text" name="fieldName'+count+'"class="form-control m-input" placeholder="Field Name" autocomplete="off" required>';
+        html += '<div class="invalid-feedback">Please choose the field name.</div>';
+        html += '</div>';
+
+        html += '<div class="col-auto">';
+        html += '<select class="form-select" name ="fieldOperator'+count+'"><option value = "equals" selected>&#61;</option><option value = "not equals">&#8800;</option><option value = "greater than">&#62;</option><option value = "greater than equals">&#8925;</option><option value = "less than">&#60;</option><option value = "less than equals">&#8924;</option><option value = "in">in</option><option value = "like">like</option></select>';
+        html += '</div>';
+
+        html += '<div id= "fieldValuediv" class="col-auto">';
+        html += '<input type="text" name="fieldValue'+count+'" class="form-control m-input" placeholder="Field Value" autocomplete="off""';
+        html += '</div></div>';
+
+        html += '<div class="col-auto">';
+        html += '<select class="form-select" id ="recordOperator'+count+'" name ="recordOperator'+count+'"><option value = "" selected>---</option><option value = "OR">OR</option><option value = "AND">AND</option></select>';
+        html += '</div>';
+
+        html += '<div id = "buttonDiv" class="col-auto">';
+        html += '<button id="removeRow" type="button" class="btn btn-dark fas fa-trash-alt"></button>';
+        html += '</div>';
+
+        html += '</div>';
+        count=parseInt(count)+1;
+
+        $('#newRow').append(html);
+
+    });
+
+    // remove row
+    $(document).on('click', '#removeRow', function () {
+        $(this).closest('#inputFormRow').remove();
+        count=parseInt(count)-1;
+        if (count == 1){
+                    $('#newRow').empty();
+                }
+    });
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+</script>
+
+</body>
+</html>

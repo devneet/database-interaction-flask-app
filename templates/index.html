@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Database Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/05cd9c4554.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    <script>
+        var dbTypeObject = {
+            "MySQL": ["CREATE","INSERT","BULK INSERT","UPDATE","DELETE","SELECT"],
+            "MongoDB": ["INSERT","BULK INSERT","UPDATE","DELETE","SELECT"],
+            "Cassandra": ["CREATE","INSERT","BULK INSERT","UPDATE","DELETE","SELECT"]
+            }
+
+window.onload = function() {
+
+  var dbTypeSel = document.getElementById("dbtype");
+  var dbOperationTypeSel = document.getElementById("dbActiontype");
+
+  for (var x in dbTypeObject) {
+
+    dbTypeSel.options[dbTypeSel.options.length] = new Option(x, x);
+  }
+
+  var z =dbTypeObject[dbTypeSel.value];
+
+    z.forEach(function(entry){
+    	dbOperationTypeSel.options[dbOperationTypeSel.options.length] = new Option(entry,entry);
+
+	});
+
+  dbTypeSel.onchange = function(){
+
+  	dbOperationTypeSel.length = 0
+
+    var z =dbTypeObject[dbTypeSel.value];
+
+    z.forEach(function(entry){
+
+    	dbOperationTypeSel.options[dbOperationTypeSel.options.length] = new Option(entry,entry);
+
+	});
+
+  }
+
+}
+</script>
+</head>
+<body style = "background-color: #E7DF86">
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Database Functionality Selection</h1>
+            <p class="lead">The database type and functionality form for interacting with various databases.</p>
+        </div>
+    <div class="accordion accordion-flush" id="accordionExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" style = "background-color: #DCE1E3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Show Me - How To Use It !
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                  <marquee>
+                    <strong>Please select the database type and the action you want to perform with the database from the options given below.</strong>
+                  </marquee>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+       <p></p>
+
+    <div class="container">
+        <form method="post" action="/response" class="container row g-3">
+            <div class="form-group col-lg-12 form-floating fs-6 has-validation">
+                <select id="dbtype" class="form-control dbtype selectFilter" data-target="actiontype" name="dbtype" class="fw-light">
+                </select>
+                <label for="dbtype" class="fw-light">Database Type</label>
+                <small id="dbtypeHelp" class="form-text text-muted">The type of database on which the operation needs to be performed.</small>
+            </div>
+
+            <div class="form-group col-lg-12 form-floating fs-6 has-validation">
+                <select id="dbActiontype" class="form-control dbtype selectFilter" data-target="dbActiontype" name="dbActiontype" class="fw-light">
+                </select>
+                <label for="dbActiontype" class="fw-light">Database Operation</label>
+                <small id="dbActiontypeHelp" class="form-text text-muted">The operation to be performed on the database.</small>
+            </div>
+            <div class="form-group col-md-5">
+                <button type="submit" class="btn btn-dark col-md-2">Submit</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

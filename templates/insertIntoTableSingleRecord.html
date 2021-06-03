@@ -1,0 +1,190 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert Into Table Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/05cd9c4554.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='/icons/db-icon.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+      </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/create_table/">Create Table</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_multiple_records/">Bulk Insert</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/update_table/">Update Record</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/delete_from_table/">Delete Record</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/download_data/">Download Records</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Insert Single Record Form - {{db_type}}</h1>
+            <p class="lead">The table insertion form for single record in MySQL database.</p>
+        </div>
+    </div>
+    <form method="POST" action="/insert_table_single_record/" class="container row g-3 needs-validation">
+            <div class="form-group col-md-6 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="username" name ="username" aria-describedby="usernameHelp" placeholder="Enter username" required>
+                <label for="username" class="fw-light">Username</label>
+                <small id="usernameHelp" class="form-text text-muted">The username required to connect to MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the username.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password" aria-describedby="passwordHelp" required>
+                <label for="password" class="fw-light">Password</label>
+                <small id="passwordHelp" class="form-text text-muted">The password required to connect to MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the password.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="dbName" name ="database_name" aria-describedby="dbNameHelp" placeholder="Enter database name" required>
+                <label for="dbName" class="fw-light">Database Name</label>
+                <small id="dbNameHelp" class="form-text text-muted">The MySQL database to connect to.</small>
+                <div class="invalid-feedback">
+                    Please choose the database name.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="tableName" name="table_name" aria-describedby="tableNameHelp" placeholder="Enter database name" required>
+                <label for="tableName" class="fw-light">Table Name</label>
+                <small id="tableNameHelp" class="form-text text-muted">The name of the table to be created in the MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the table name.
+                </div>
+            </div>
+        <div class="col-lg-15" id="buttons">
+            <button id="describeTable" type="submit" class="btn btn-dark fas fa-plus col-lg-2">  Generate Schema</button>
+        </div>
+        <div id = "status" class="alert alert-primary" role="alert"></div>
+        <div id="schemaDivision" class = "row"></div>
+    </form>
+
+<script type="text/javascript">
+
+    // Handle Field Generation Message :
+
+    let result = {{ status | tojson }};
+    let fields = {{ fields | tojson }};
+
+    if (result[0] === true){
+
+        document.getElementById("status").style.display = "block";
+
+        if (result[1] === 'SUCCESS'){
+
+            document.getElementById("status").className = "alert alert-success";
+
+            if (result[2] === 'The record got inserted successfully'){
+
+
+                document.getElementById("describeTable").className = "btn btn-dark fas fa-plus col-lg-2";
+                document.getElementById("describeTable").innerHTML = "  Generate Schema";
+
+                var myobj = document.getElementById("schemaDivision");
+                myobj.remove();
+
+            }else{
+
+                document.getElementById("describeTable").className = "btn btn-dark fa fa-paper-plane-o col-lg-2";
+                document.getElementById("describeTable").innerHTML = "  Insert Record";
+
+            }
+
+
+
+            // Generate Schema :
+
+            var html = '<div class="jumbotron jumbotron-fluid"><div class="container"><h3>Field Values</h6><p class="lead">The value of different fields for the record to be inserted.</p></div></div>';
+            html += '<p></p><div class = "row">';
+            fields.forEach(function(form){
+
+                html += '<br><br>'
+                html += '<div class="form-group col-md-3 form-floating fs-6">'
+                html += '<input type="text" class="form-control" id="'+form+'_field" name="'+form+'_field" aria-describedby="'+form+'_fieldHelp" placeholder="'+form+'" required>'
+                html += '<label for="'+form+'_field" class="fw-light">'+form+'</label>'
+                html += '<small id="'+form+'_fieldHelp" class="form-text text-muted">Enter the '+form+' field value.</small>'
+                html += '</div>'
+
+
+            });
+            html += '</div>'
+             $('#schemaDivision').append(html);
+
+
+        }else{
+
+            document.getElementById("status").className = "alert alert-danger";
+
+        }
+
+        document.getElementById("status").innerHTML = result[2];
+    }
+    else{
+
+        document.getElementById("status").style.display = "none";
+
+    }
+
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+</script>
+
+</body>
+</html>

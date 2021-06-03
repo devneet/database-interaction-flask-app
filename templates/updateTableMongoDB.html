@@ -1,0 +1,194 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Table Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/05cd9c4554.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='/icons/db-icon.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+      </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_single_record_mongodb/">Insert Single Record</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_multiple_records_mongodb/">Bulk Insert</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/delete_from_table_mongodb/">Delete Record</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dboperation/{{db_type}}/download_data_mongodb/">Download Records</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Update Table Form - {{db_type}}</h1>
+            <p class="lead">The table updation form for MongoDB database.</p>
+        </div>
+
+        <div class="accordion accordion-flush" id="accordionExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Show Me - How To Use It !
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                  <marquee>
+                    <strong>Please fill all the details given below. Please type the exact connection URI from the connection pane of your cluster in case you're using MongoDB Atlas, otherwise you can provide the local machine hostname and port number to proceed.</strong>
+                  </marquee>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+    <p></p>
+    <form method="POST" action="/update_table_record_mongodb/" class="container row g-3 needs-validation">
+            <div class="form-group col-lg-12 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="hostName" name ="hostName" aria-describedby="hostNameHelp" placeholder="Enter Host Name" required>
+                <label for="hostName" class="fw-light">Host URI</label>
+                <small id="hostNameHelp" class="form-text text-muted">The URI address for the host connection in case of Atlas cloud cluster or the hostname and port address for the local MongoDB connection.</small>
+                <div class="invalid-feedback">
+                    Please choose the host name.
+                </div>
+            </div>
+            <div class="form-group col-md-6 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="username" name ="username" aria-describedby="usernameHelp" placeholder="Enter username">
+                <label for="username" class="fw-light">Username</label>
+                <small id="usernameHelp" class="form-text text-muted">The username required to connect to MongoDB server, if present.</small>
+                <div class="invalid-feedback">
+                    Please choose the username.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password" aria-describedby="passwordHelp">
+                <label for="password" class="fw-light">Password</label>
+                <small id="passwordHelp" class="form-text text-muted">The password required to connect to MongoDB server, if present.</small>
+                <div class="invalid-feedback">
+                    Please choose the password.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="databaseName" name ="databaseName" aria-describedby="databaseNameHelp" placeholder="Enter database name" required>
+                <label for="databaseName" class="fw-light">Database Name</label>
+                <small id="databaseNameHelp" class="form-text text-muted">The MongoDB database where the collection is present.</small>
+                <div class="invalid-feedback">
+                    Please choose the database name.
+                </div>
+            </div>
+            <div class="form-group col-lg-6 form-floating fs-6 has-validation">
+                <input type="text" class="form-control" id="collectionName" name="collectionName" aria-describedby="collectionNameHelp" placeholder="Enter collection name" required>
+                <label for="collectionName" class="fw-light">Collection Name</label>
+                <small id="collectionNameHelp" class="form-text text-muted">The name of the collection to be created in the MongoDB database.</small>
+                <div class="invalid-feedback">
+                    Please choose the collection name.
+                </div>
+            </div>
+            <div class="form-group mb-3 col-lg-6 fs-6 has-validation">
+                <label for="updateFieldData" class="fw-light form-label" >Data To Be Updated</label>
+                <textarea rows = "5" class="form-control" id="updateFieldData" name ="updateFieldData" aria-describedby="updateFieldDataHelp" placeholder="Enter the data to be updated" required></textarea>
+                <small id="updateFieldDataHelp" class="form-text text-muted">The data to be updated in place of the existing document record in the given collection of the given MongoDB database in JSON format.</small>
+                <div class="invalid-feedback">
+                    Please choose the data to be updated.
+                </div>
+            </div>
+             <div class="form-group mb-3 col-lg-6 fs-6 has-validation">
+                <label for="conditionalQuery" class="fw-light form-label" >Conditional Statement</label>
+                <textarea rows = "5" class="form-control" id="conditionalQuery" name ="conditionalQuery" aria-describedby="conditionalQueryHelp" placeholder="Enter conditional statement"></textarea>
+                <small id="conditionalQueryHelp" class="form-text text-muted">The conditional MQL query to search for the document record to be updated in the given collection of the given MongoDB database in JSON format.</small>
+                <div class="invalid-feedback">
+                    Please choose the conditional statement.
+                </div>
+            </div>
+
+        <div class="col-lg-15" id="buttons">
+            <button id="submit" type="submit" class="btn btn-dark fas fa-pen-alt col-lg-2">  Update Data</button>
+        </div>
+        <div id = "status" class="alert alert-primary" role="alert"></div>
+    </form>
+
+<script type="text/javascript">
+
+    // Handle Field Generation Message :
+
+    let result = {{ status | tojson }};
+
+    if (result[0] === true){
+
+        document.getElementById("status").style.display = "block";
+
+        if (result[1] === 'SUCCESS'){
+
+            document.getElementById("status").className = "alert alert-success";
+
+        }else{
+
+            document.getElementById("status").className = "alert alert-danger";
+
+        }
+
+        document.getElementById("status").innerHTML = result[2];
+    }
+    else{
+
+        document.getElementById("status").style.display = "none";
+
+    }
+
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function () {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+</script>
+
+</body>
+</html>
