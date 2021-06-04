@@ -93,6 +93,17 @@ class MySqlOperations :
             else :
                 table_def_string += ')'
 
+        sql_query = "SHOW TABLES"
+        self.cursor.execute(sql_query)
+
+        rows = self.cursor.fetchall()
+
+        for row in list(rows):
+            if table_name == row[0]:
+                sql_query = "DROP TABLE "+table_name
+                self.cursor.execute(sql_query)
+                break
+
         sql_query = "CREATE TABLE IF NOT EXISTS "+table_name+"( "+table_def_string
 
         self.log_object.logToFile('debug', 'SQL query got created as : '+sql_query)

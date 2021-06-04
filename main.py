@@ -20,6 +20,7 @@ import datetime
 from src.setup_logger import logger
 from src.file_operations import FileOperations
 from src.mysql_operations import MySqlOperations
+from src.sql_server_operations import MicrosoftSQLServerOperations
 from src.mongodb_operations import MongoDBOperations
 from src.cassandra_operations import CassandraOperations
 from flask import Flask, redirect, jsonify, request, render_template,url_for,send_file
@@ -1117,6 +1118,405 @@ def table_update_schema_input():
 #                                             End Block : MySQL Database Operation Functions :                                           #
 ##########################################################################################################################################
 
+
+
+####################################################################################################################################################
+#                                             Start Block : MS SQL Server Database Operation Functions :                                           #
+####################################################################################################################################################
+
+################################################
+#          1) Create Table Function :          #
+################################################
+
+@app.route('/create_table_sql_server/', methods = ["GET","POST"])
+def initiate_table_creation_sql_server():
+
+    try :
+
+        log_object.logToFile('debug', 'Initiating table creation....')
+        userName = request.form['username']
+        password = request.form['password']
+        database_name = request.form['database_name']
+        server_name = request.form['server_name']
+        table_name = request.form['table_name']
+
+        fields = {}
+
+        log_object.logToFile('debug', 'Preparing the fields details list for table creation....')
+
+        for element in request.form.keys():
+            if element.find("fieldName") > -1:
+                field_no = re.findall('[0-9]+', element)[0]
+                field_type_element = "fieldType" + field_no
+                fields[request.form.get(element)] = request.form.get(field_type_element)
+
+        log_object.logToFile('debug', 'Fields details list have been prepared for table creation....')
+
+        table_obj = MicrosoftSQLServerOperations(userName,password,database_name,server_name)
+        table_obj.create_table(table_name,fields)
+
+        log_object.logToFile('info', 'Rendering the Table Creation Form page....')
+        return render_template('createTableSQLServer.html', db_type="Microsoft SQL Server", status = [True,"SUCCESS" ,"Table got created successfully"])
+
+    except Exception as e :
+
+        log_object.logToFile('exception', "Table could not be created due to the following exception: "+str(e))
+        return render_template('createTableSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "ERROR", "Table could not be created due to the following exception: "+str(e)])
+
+
+################################################
+#     2) Insert Single Record Function :       #
+################################################
+
+@app.route('/insert_table_single_record_sql_server/', methods = ["GET","POST"])
+def table_insertion_single_record_schema_input_sql_server():
+
+        try :
+
+            log_object.logToFile('debug', 'Routed to the Insert Single Record schema generation page....')
+
+            userName = request.form['username']
+            password = request.form['password']
+            database_name = request.form['database_name']
+            table_name = request.form['table_name']
+            server_name = request.form['server_name']
+
+            value_inserted = False
+
+
+            log_object.logToFile('debug', 'Checking if schema generation has already been completed or not....')
+
+            for element in request.form.keys():
+                if element.find("_field") > -1:
+                    value_inserted = True
+
+            if value_inserted == False:
+
+                try:
+                    log_object.logToFile('debug', 'The schema is being generated for the table....')
+
+                    table_obj = MicrosoftSQLServerOperations(userName,password,database_name,server_name)
+                    schema = table_obj.generate_schema(table_name)
+
+                    fields = []
+
+                    for i in schema :
+                        fields.append(i[0])
+
+                    log_object.logToFile('info', 'Rendering the Table Insertion For Single Record Form page with generated schema....')
+                    return render_template('insertIntoTableSingleRecordSQLServer.html', db_type="Microsoft SQL Server", status=[True, "SUCCESS", "Table schema has been generated."], fields = fields)
+
+                except Exception as e :
+                    log_object.logToFile('exception', "Table schema could not be generated due to the following exception: " + str(e))
+                    return render_template('insertIntoTableSingleRecordSQLServer.html', db_type="Microsoft SQL Server",
+                                       status=[True, "ERROR",
+                                               "Table schema could not be generated due to the following exception: " + str(e)], fields = [])
+
+            else :
+
+                log_object.logToFile('debug', 'The record is being inserted into the table....')
+                try:
+
+                    userName = request.form['username']
+                    password = request.form['password']
+                    database_name = request.form['database_name']
+                    table_name = request.form['table_name']
+                    server_name = request.form['server_name']
+
+                    fields = {}
+
+                    for element in request.form.keys():
+                        if element.find("_field") > -1:
+                            fields[element.replace("_field","")] = request.form.get(element)
+
+                    table_obj = MicrosoftSQLServerOperations(userName, password, database_name,server_name)
+                    table_obj.insert_into_table_single_record(table_name, fields)
+
+                    log_object.logToFile('info',
+                                         'Rendering the Table Insertion For Single Record Form page with record insertion message....')
+                    return render_template('insertIntoTableSingleRecordSQLServer.html', db_type="Microsoft SQL Server",
+                                           status=[True, "SUCCESS",
+                                                   "The record got inserted successfully"], fields=[])
+                except Exception as e :
+                    log_object.logToFile('exception',
+                                         "The record could not get inserted into the table due to the following exception: " + str(e))
+                    return render_template('insertIntoTableSingleRecordSQLServer.html', db_type="Microsoft SQL Server",
+                                           status=[True, "ERROR",
+                                                   "The record could not get inserted into the table due to the following exception: " + str(
+                                                       e)], fields=[])
+
+        except Exception as e:
+
+            log_object.logToFile('exception',
+                                 "An unknown exception occurred : " + str(
+                                     e))
+
+            return render_template('insertIntoTableSingleRecordSQLServer.html', db_type="Microsoft SQL Server",
+                                   status=[True, "ERROR",
+                                           "An unknown exception occurred : " + str(e)],
+                                   fields=[])
+
+################################################
+#   3) Insert Multiple Records Function :      #
+################################################
+
+@app.route('/insert_table_mutliple_records_sql_server', methods = ["GET","POST"])
+def table_insertion_multiple_records_sql_server():
+
+    try :
+        log_object.logToFile('debug', 'Initiating bulk data insertion....')
+        userName = request.form['username']
+        password = request.form['password']
+        database_name = request.form['database_name']
+        table_name = request.form['table_name']
+        server_name = request.form['server_name']
+
+        log_object.logToFile('debug', 'Dataset with multiple records is being inserted into the table....')
+
+        try:
+            includeHeaders = request.form['includeHeaders']
+        except Exception as e :
+            includeHeaders = 'off'
+
+        data_file = request.files['insert_file']
+
+        file_object = FileOperations()
+        file_object.saveFile(data_file,3)
+        headers, values = file_object.readCSVFile(str(data_file.filename),includeHeaders)
+
+        try :
+
+            table_obj = MicrosoftSQLServerOperations(userName, password, database_name,server_name)
+            table_obj.insert_into_table_multiple_records(table_name,headers,values)
+            file_object.deleteFile(str(data_file.filename))
+
+            log_object.logToFile('info',
+                                 'Rendering the Table Insertion For Multiple Records Form page with record insertion message....')
+            return render_template('insertIntoTableMultipleRecordsSQLServer.html', db_type="Microsoft SQL Server",
+                                   status=[True, "SUCCESS", "All records got inserted successfully"])
+
+        except Exception as e :
+            log_object.logToFile('exception',
+                                 "Bulk insertion failed due to the following exception: " + str(
+                                     e))
+            return render_template('insertIntoTableMultipleRecordsAQLServer.html', db_type="Microsoft SQL Server",
+                                   status=[True, "ERROR",
+                                           "Bulk insertion failed due to the following exception: " + str(e)])
+
+    except Exception as e:
+
+        log_object.logToFile('exception',
+                             "An unknown exception occurred : " + str(
+                                 e))
+
+        return render_template('insertIntoTableMultipleRecordsSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "ERROR",
+                                       "An unknown exception occurred : " + str(e)],
+                               fields=[])
+
+################################################
+#     4) Download Table Data Function :        #
+################################################
+
+@app.route('/download_table_data_sql_server/', methods = ["GET","POST"])
+def table_download_data_sql_server():
+
+    try :
+
+        log_object.logToFile('debug', 'Initiating table data download....')
+
+        userName = request.form['username']
+        password = request.form['password']
+        database_name = request.form['database_name']
+        table_name = request.form['table_name']
+        noOfRows = request.form['rowLimit']
+        server_name = request.form['server_name']
+
+        conditional_fields = []
+
+        log_object.logToFile('debug', 'Preparing conditional fields list....')
+        for element in request.form.keys():
+            if element.find("fieldName") > -1:
+                field_no = re.findall('[0-9]+', element)[0]
+                conditional_fields.append([request.form.get(element), request.form.get("fieldOperator" + str(field_no)),
+                                           request.form.get("fieldValue" + str(field_no)),
+                                           request.form.get("recordOperator" + str(field_no))])
+
+        log_object.logToFile('debug', 'Fetching data from the table....')
+
+        table_obj = MicrosoftSQLServerOperations(userName,password,database_name,server_name)
+        headers,results = table_obj.select_records(table_name,conditional_fields,noOfRows)
+
+        log_object.logToFile('debug', 'Writing CSV file with table data....')
+        file_name = "MSSQLServer_"+table_name+"_"+datetime.datetime.now().strftime("%d%b%Y")+".csv"
+
+        file_object = FileOperations()
+        file_object.removeFilesWithExtension('.', 'csv')
+        file_object.writeToCSV(file_name,results,headers)
+
+        log_object.logToFile('debug', 'Downloading file from Flask server....')
+
+        return send_file(file_name, as_attachment=True)
+
+    except Exception as e :
+
+        log_object.logToFile('exception',
+                             "Table data could not get downloaded due to the following exception: " + str(e))
+        return render_template('downloadDataSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "ERROR", "Table data could not get downloaded due to the following exception: "+str(e)])
+
+
+################################################
+#   5) Delete Records From Table Function :    #
+################################################
+
+@app.route('/delete_data_from_table_sql_server/', methods = ["GET","POST"])
+def table_delete_data_sql_server():
+
+    try :
+
+        log_object.logToFile('debug', 'Initiating data deletion from table....')
+
+        userName = request.form['username']
+        password = request.form['password']
+        database_name = request.form['database_name']
+        table_name = request.form['table_name']
+        server_name = request.form['server_name']
+
+        conditional_fields = []
+
+        log_object.logToFile('debug', 'Preparing conditional fields list....')
+        for element in request.form.keys():
+            if element.find("fieldName") > -1:
+                field_no = re.findall('[0-9]+', element)[0]
+                conditional_fields.append([request.form.get(element), request.form.get("fieldOperator" + str(field_no)),
+                                           request.form.get("fieldValue" + str(field_no)),
+                                           request.form.get("recordOperator" + str(field_no))])
+
+        log_object.logToFile('debug', 'Deleting data from the table....')
+
+        table_obj = MicrosoftSQLServerOperations(userName,password,database_name,server_name)
+        table_obj.delete_records(table_name,conditional_fields)
+
+        log_object.logToFile('info', 'Rendering the Data Deletion Form page....')
+        return render_template('deleteFromTableSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "SUCCESS", "Data got deleted from the table successfully"])
+
+    except Exception as e :
+
+        log_object.logToFile('exception',
+                             "Table data could not be deleted due to the following exception: " + str(e))
+        return render_template('deleteFromTableSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "ERROR", "Table data could not be deleted due to the following exception: "+str(e)])
+
+
+################################################
+#          6) Update Table Function :          #
+################################################
+
+@app.route('/update_table_record_sql_server/', methods = ["GET","POST"])
+def table_update_schema_input_sql_server():
+
+    try :
+
+        log_object.logToFile('debug', 'Routed to the Update Table schema generation page....')
+
+        userName = request.form['username']
+        password = request.form['password']
+        database_name = request.form['database_name']
+        table_name = request.form['table_name']
+        server_name = request.form['server_name']
+
+        value_inserted = False
+
+        log_object.logToFile('debug', 'Checking if schema generation has already been completed or not....')
+
+        for element in request.form.keys():
+            if element.find("_field") > -1 :
+                value_inserted = True
+
+        if value_inserted == False :
+
+            log_object.logToFile('debug', 'The schema is being generated for the table....')
+
+            try :
+                table_obj = MicrosoftSQLServerOperations(userName,password,database_name,server_name)
+                schema = table_obj.generate_schema(table_name)
+                fields = []
+                for i in schema :
+                    fields.append(i[0])
+
+                log_object.logToFile('info', 'Rendering the Update Table Form page with generated schema....')
+                return render_template('updateTableSQLServer.html', db_type="Microsoft SQL Server", status=[True, "SUCCESS", "Table schema has been generated."], fields = fields)
+            except Exception as e :
+                log_object.logToFile('exception', "Table schema could not be generated due to the following exception: " + str(e))
+                return render_template('updateTableSQLServer.html', db_type="Microsoft SQL Server",
+                                   status=[True, "ERROR",
+                                           "Table schema could not be generated due to the following exception: " + str(e)], fields = [])
+
+        else :
+
+            log_object.logToFile('debug', 'The table has been updated....')
+            try:
+
+                userName = request.form['username']
+                password = request.form['password']
+                database_name = request.form['database_name']
+                table_name = request.form['table_name']
+                server_name = request.form['server_name']
+
+                fields = {}
+                log_object.logToFile('debug', 'Preparing fields to be updated list....')
+                for element in request.form.keys():
+                    if element.find("_field") > -1:
+                        fields[element.replace("_field","")] = request.form.get(element)
+
+
+                conditional_fields = []
+
+                log_object.logToFile('debug', 'Preparing conditional fields list....')
+                for element in request.form.keys():
+                    if element.find("fieldName") > -1:
+                        field_no = re.findall('[0-9]+', element)[0]
+                        conditional_fields.append(
+                            [request.form.get(element), request.form.get("fieldOperator" + str(field_no)),
+                             request.form.get("fieldValue" + str(field_no)),
+                             request.form.get("recordOperator" + str(field_no))])
+
+                table_obj = MicrosoftSQLServerOperations(userName, password, database_name,server_name)
+                table_obj.update_table(table_name, fields, conditional_fields)
+
+                log_object.logToFile('info',
+                                     'Rendering the Update Table Form page with table updation message....')
+
+                return render_template('updateTableSQLServer.html', db_type="Microsoft SQL Server",
+                                      status=[True, "SUCCESS",
+                                            "The table has been updated successfully"], fields=[])
+            except Exception as e :
+                log_object.logToFile('exception',
+                                     "The table could not get updated due to the following exception: " + str(e))
+                return render_template('updateTableSQLServer.html', db_type="Microsoft SQL Server",
+                                       status=[True, "ERROR",
+                                               "The table could not get updated due to the following exception: " + str(
+                                                   e)], fields=[])
+
+    except Exception as e:
+
+        log_object.logToFile('exception',
+                             "An unknown exception occurred : " + str(
+                                 e))
+
+        return render_template('updateTableSQLServer.html', db_type="Microsoft SQL Server",
+                               status=[True, "ERROR",
+                                       "An unknown exception occurred : " + str(e)],
+                               fields=[])
+
+##################################################################################################################################################
+#                                             End Block : MS SQL Server Database Operation Functions :                                           #
+##################################################################################################################################################
+
+
 ##########################################################################################################################################
 #                                               Start Block : MySQL Routing Functions :                                                  #
 ##########################################################################################################################################
@@ -1300,8 +1700,73 @@ def table_update_data_page_mongodb(db_selected):
     log_object.logToFile('debug', 'Routed to the Update Table form page for Cassandra....')
     return render_template('updateTableMongoDB.html', db_type=db_selected, status=[False, "", ""], fields=[])
 
+
+#################################################################
+#  18) Routing To Create Table Function For MS SQL Server :     #
+#################################################################
+
+@app.route('/dboperation/<db_selected>/create_table_sql_server/')
+def table_creation_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Create Table form page for Microsoft SQL Server....')
+    return render_template('createTableSQLServer.html', db_type=db_selected, status = [False,"" ,""])
+
+
+###############################################################################
+# 19) Routing To Insert Single Record Into Table Function For MS SQL Server : #
+###############################################################################
+
+@app.route('/dboperation/<db_selected>/insert_table_single_record_sql_server/')
+def table_insertion_single_record_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Insert Into Table For Single Record form page for Microsoft SQL Server....')
+    return render_template('insertIntoTableSingleRecordSQLServer.html', db_type=db_selected, status=[False, "", ""], fields=[])
+
+###################################################################################
+# 20) Routing To Insert Multiple Records Into Table Function For MS SQL Server :  #
+###################################################################################
+
+@app.route('/dboperation/<db_selected>/insert_table_multiple_records_sql_server/')
+def table_insertion_multiple_records_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Insert Into Table For Multiple Records form page for Microsoft SQL Server....')
+    return render_template('insertIntoTableMultipleRecordsSQLServer.html', db_type=db_selected, status=[False, "", ""], fields=[])
+
+
+#########################################################################
+# 21) Routing To Download Table Data Function For MS SQL Server :       #
+#########################################################################
+
+@app.route('/dboperation/<db_selected>/download_data_sql_server/')
+def table_download_data_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Download Data From Table form page for Microsoft SQL Server....')
+    return render_template('downloadDataSQLServer.html', db_type=db_selected, status=[False, "", ""])
+
+
+##########################################################################
+#  22) Routing To Delete Records From Table Function For MS SQL Server : #
+##########################################################################
+
+@app.route('/dboperation/<db_selected>/delete_from_table_sql_server/')
+def table_delete_data_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Delete Data From Table form page for Microsoft SQL Server....')
+    return render_template('deleteFromTableSQLServer.html', db_type=db_selected, status=[False, "", ""])
+
+#########################################################################
+#  23) Routing To Update Table Data Function For MS SQL Server :        #
+#########################################################################
+
+@app.route('/dboperation/<db_selected>/update_table_sql_server/')
+def table_update_data_page_sql_server(db_selected):
+
+    log_object.logToFile('debug', 'Routed to the Update Table form page for Microsoft SQL Server....')
+    return render_template('updateTableSQLServer.html', db_type=db_selected, status=[False, "", ""], fields=[])
+
+
 ##################################################################
-#   18) Routing To Database Actions Function :                   #
+#   24) Routing To Database Actions Function :                   #
 ##################################################################
 
 @app.route('/response', methods = ['POST'])
@@ -1330,6 +1795,25 @@ def home_page_response():
     elif actionType.lower() == "update" and dbType.lower() == 'mysql' :
         log_object.logToFile('debug', 'Redirecting to update_table URl....')
         return redirect(url_for('table_update_data_page', db_selected=dbType))
+
+    elif actionType.lower() == "create" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to create_table_sql_server URl....')
+        return redirect(url_for('table_creation_page_sql_server',db_selected = dbType))
+    elif actionType.lower() == "insert" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to insert_single_record_sql_server URl....')
+        return redirect(url_for('table_insertion_single_record_page_sql_server', db_selected=dbType))
+    elif actionType.lower() == "bulk insert" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to insert_multiple_records_sql_server URl....')
+        return redirect(url_for('table_insertion_multiple_records_page_sql_server', db_selected=dbType))
+    elif actionType.lower() == "select" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to download_data_sql_server URl....')
+        return redirect(url_for('table_download_data_page_sql_server', db_selected=dbType))
+    elif actionType.lower() == "delete" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to delete_from_table_sql_server URl....')
+        return redirect(url_for('table_delete_data_page_sql_server', db_selected=dbType))
+    elif actionType.lower() == "update" and dbType.lower() == 'microsoft sql server' :
+        log_object.logToFile('debug', 'Redirecting to update_table_sql_server URl....')
+        return redirect(url_for('table_update_data_page_sql_server', db_selected=dbType))
 
     elif actionType.lower() == "create" and dbType.lower() == 'cassandra' :
         log_object.logToFile('debug', 'Redirecting to create_table_cassandra URl....')
@@ -1367,7 +1851,7 @@ def home_page_response():
         return redirect(url_for('table_update_data_page_mongodb',db_selected = dbType))
 
 ##################################################################
-#   19) Routing To Home Page Function :                          #
+#   25) Routing To Home Page Function :                          #
 ##################################################################
 
 @app.route('/', methods = ['GET','POST'])

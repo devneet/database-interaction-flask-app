@@ -1,5 +1,5 @@
 # Database Interaction Application
-##### _A flask architecture based web application interacting with multiple databases - MySQL, Cassandra and MongoDB_
+##### _A flask architecture based web application interacting with multiple databases - MySQL, Microsft SQL Server, Cassandra and MongoDB_
 
 This is a web application built on top of front end technology frameworks such as 
 - HTML5
@@ -10,8 +10,9 @@ This is a web application built on top of front end technology frameworks such a
 
 It incorporates Flask framework to utilise various API's in order to interact with back end databases such as
 - MySQL
+- Microsoft SQL Server
 - Cassandra
-- MongoDB.
+- MongoDB
 
 ## Features
 
@@ -31,3 +32,4 @@ The web application ca be used to perfrom various backend activities such as :
 - Cassandra Driver
 - PyMongo
 - MySQL Connector
+- Pyodbc
