@@ -35,7 +35,7 @@ class MySqlOperations :
     #     1) Initialising Function :               #
     ################################################
 
-    def __init__(self,username,password,db_name):
+    def __init__(self,username,password,db_name,host_name):
 
         '''
 
@@ -43,18 +43,24 @@ class MySqlOperations :
         :param username: The username required for connecting to MySQL server, if any.
         :param password: The password required for connecting to MySQL server, if any.
         :param db_name: The database name in the MySQL server where the operations need to be performed.
+        :param host_name : The host name required to connect to the MySQL server.
 
         '''
 
         self.username = username
         self.password = password
         self.db_name = db_name
+        self.host_name = host_name
 
         self.log_object = logger()
         self.log_object.logToFile('info','Establishing connection to the MySQL database....')
 
         try:
-            self.conn = mysql.connector.connect(host='127.0.0.1',database=db_name, username=username,password=password)
+            self.conn = mysql.connector.connect(host=self.host_name, username=self.username,password=self.password)
+            self.cursor = self.conn.cursor()
+            self.cursor.execute("CREATE DATABASE IF NOT EXISTS "+self.db_name)
+            self.cursor.execute("USE " + self.db_name)
+
         except Exception as e :
             self.log_object.logToFile('critical', 'An error occurred while connecting to the MySQL database : '+str(e))
             raise Exception(str(e))
@@ -76,7 +82,6 @@ class MySqlOperations :
         '''
 
         self.log_object.logToFile('info', 'Creating table '+table_name)
-        cursor = self.conn.cursor()
 
         self.log_object.logToFile('debug', 'Creating the SQL Query....')
         table_def_string = ""
@@ -93,7 +98,7 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : '+sql_query)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor.execute(sql_query)
+        self.cursor.execute(sql_query)
 
         self.log_object.logToFile('debug', 'The query got executed successfully....')
         self.log_object.logToFile('info', 'The table has been created....')
@@ -116,7 +121,6 @@ class MySqlOperations :
         '''
 
         self.log_object.logToFile('info', 'Generating table schema for : '+table_name)
-        cursor = self.conn.cursor()
 
         self.log_object.logToFile('debug', 'Creating the SQL Query....')
 
@@ -125,9 +129,9 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : '+sql_query)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor.execute(sql_query)
+        self.cursor.execute(sql_query)
 
-        result = list(cursor.description)
+        result = list(self.cursor.description)
 
         self.log_object.logToFile('debug', 'The query got executed successfully....')
 
@@ -176,8 +180,7 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : ' + sql_string)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor = self.conn.cursor()
-        cursor.execute(sql_string)
+        self.cursor.execute(sql_string)
         self.conn.commit()
 
         self.log_object.logToFile('debug', 'The query got executed successfully....')
@@ -251,8 +254,7 @@ class MySqlOperations :
             self.log_object.logToFile('debug', 'SQL query got created as : ' + sql_string)
             self.log_object.logToFile('debug', 'Executing the query for record no. : '+str(record_idx)+'....')
 
-            cursor = self.conn.cursor()
-            cursor.execute(sql_string)
+            self.cursor.execute(sql_string)
             self.conn.commit()
 
             self.log_object.logToFile('debug', 'The query got executed successfully....')
@@ -344,11 +346,10 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : ' + sql_query)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor = self.conn.cursor()
-        cursor.execute(sql_query)
+        self.cursor.execute(sql_query)
 
-        results = list(cursor.fetchall())
-        headers = [i[0] for i in cursor.description]
+        results = list(self.cursor.fetchall())
+        headers = [i[0] for i in self.cursor.description]
 
         self.log_object.logToFile('info', 'Closing the database connection....')
         self.conn.close()
@@ -429,8 +430,7 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : ' + sql_query)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor = self.conn.cursor()
-        cursor.execute(sql_query)
+        self.cursor.execute(sql_query)
         self.conn.commit()
 
         self.log_object.logToFile('info', 'Closing the database connection....')
@@ -531,8 +531,7 @@ class MySqlOperations :
         self.log_object.logToFile('debug', 'SQL query got created as : ' + sql_query)
         self.log_object.logToFile('debug', 'Executing the query....')
 
-        cursor = self.conn.cursor()
-        cursor.execute(sql_query)
+        self.cursor.execute(sql_query)
         self.conn.commit()
 
         self.log_object.logToFile('info', 'Closing the database connection....')

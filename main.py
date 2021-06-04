@@ -738,6 +738,7 @@ def initiate_table_creation():
         userName = request.form['username']
         password = request.form['password']
         database_name = request.form['database_name']
+        host_name = request.form['host_name']
         table_name = request.form['table_name']
 
         fields = {}
@@ -752,7 +753,7 @@ def initiate_table_creation():
 
         log_object.logToFile('debug', 'Fields details list have been prepared for table creation....')
 
-        table_obj = MySqlOperations(userName,password,database_name)
+        table_obj = MySqlOperations(userName,password,database_name,host_name)
         table_obj.create_table(table_name,fields)
 
         log_object.logToFile('info', 'Rendering the Table Creation Form page....')
@@ -780,6 +781,7 @@ def table_insertion_single_record_schema_input():
             password = request.form['password']
             database_name = request.form['database_name']
             table_name = request.form['table_name']
+            host_name = request.form['host_name']
 
             value_inserted = False
 
@@ -795,7 +797,7 @@ def table_insertion_single_record_schema_input():
                 try:
                     log_object.logToFile('debug', 'The schema is being generated for the table....')
 
-                    table_obj = MySqlOperations(userName,password,database_name)
+                    table_obj = MySqlOperations(userName,password,database_name,host_name)
                     schema = table_obj.generate_schema(table_name)
 
                     fields = []
@@ -821,6 +823,7 @@ def table_insertion_single_record_schema_input():
                     password = request.form['password']
                     database_name = request.form['database_name']
                     table_name = request.form['table_name']
+                    host_name = request.form['host_name']
 
                     fields = {}
 
@@ -828,7 +831,7 @@ def table_insertion_single_record_schema_input():
                         if element.find("_field") > -1:
                             fields[element.replace("_field","")] = request.form.get(element)
 
-                    table_obj = MySqlOperations(userName, password, database_name)
+                    table_obj = MySqlOperations(userName, password, database_name,host_name)
                     table_obj.insert_into_table_single_record(table_name, fields)
 
                     log_object.logToFile('info',
@@ -868,6 +871,7 @@ def table_insertion_multiple_records():
         password = request.form['password']
         database_name = request.form['database_name']
         table_name = request.form['table_name']
+        host_name = request.form['host_name']
 
         log_object.logToFile('debug', 'Dataset with multiple records is being inserted into the table....')
 
@@ -884,7 +888,7 @@ def table_insertion_multiple_records():
 
         try :
 
-            table_obj = MySqlOperations(userName, password, database_name)
+            table_obj = MySqlOperations(userName, password, database_name,host_name)
             table_obj.insert_into_table_multiple_records(table_name,headers,values)
             file_object.deleteFile(str(data_file.filename))
 
@@ -928,6 +932,7 @@ def table_download_data():
         database_name = request.form['database_name']
         table_name = request.form['table_name']
         noOfRows = request.form['rowLimit']
+        host_name = request.form['host_name']
 
         conditional_fields = []
 
@@ -941,7 +946,7 @@ def table_download_data():
 
         log_object.logToFile('debug', 'Fetching data from the table....')
 
-        table_obj = MySqlOperations(userName,password,database_name)
+        table_obj = MySqlOperations(userName,password,database_name,host_name)
         headers,results = table_obj.select_records(table_name,conditional_fields,noOfRows)
 
         log_object.logToFile('debug', 'Writing CSV file with table data....')
@@ -978,6 +983,7 @@ def table_delete_data():
         password = request.form['password']
         database_name = request.form['database_name']
         table_name = request.form['table_name']
+        host_name = request.form['host_name']
 
         conditional_fields = []
 
@@ -991,7 +997,7 @@ def table_delete_data():
 
         log_object.logToFile('debug', 'Deleting data from the table....')
 
-        table_obj = MySqlOperations(userName,password,database_name)
+        table_obj = MySqlOperations(userName,password,database_name,host_name)
         table_obj.delete_records(table_name,conditional_fields)
 
         log_object.logToFile('info', 'Rendering the Data Deletion Form page....')
@@ -1021,6 +1027,7 @@ def table_update_schema_input():
         password = request.form['password']
         database_name = request.form['database_name']
         table_name = request.form['table_name']
+        host_name = request.form['host_name']
 
         value_inserted = False
 
@@ -1035,7 +1042,7 @@ def table_update_schema_input():
             log_object.logToFile('debug', 'The schema is being generated for the table....')
 
             try :
-                table_obj = MySqlOperations(userName,password,database_name)
+                table_obj = MySqlOperations(userName,password,database_name,host_name)
                 schema = table_obj.generate_schema(table_name)
                 fields = []
                 for i in schema :
@@ -1058,6 +1065,7 @@ def table_update_schema_input():
                 password = request.form['password']
                 database_name = request.form['database_name']
                 table_name = request.form['table_name']
+                host_name = request.form['host_name']
 
                 fields = {}
                 log_object.logToFile('debug', 'Preparing fields to be updated list....')
@@ -1077,7 +1085,7 @@ def table_update_schema_input():
                              request.form.get("fieldValue" + str(field_no)),
                              request.form.get("recordOperator" + str(field_no))])
 
-                table_obj = MySqlOperations(userName, password, database_name)
+                table_obj = MySqlOperations(userName, password, database_name,host_name)
                 table_obj.update_table(table_name, fields, conditional_fields)
 
                 log_object.logToFile('info',

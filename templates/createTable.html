@@ -13,7 +13,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
       <a class="navbar-brand" href="/">
-        <img src="{{ url_for('static', filename='/icons/db-icon.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="{{ url_for('static', filename='/icons/my-sql.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
       </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -51,6 +51,16 @@
         </div>
     </div>
     <form method="POST" action="/create_table/" class="container row g-3 needs-validation">
+
+            <div class="form-group col-lg-12 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="host_name" name ="host_name" aria-describedby="host_nameHelp" placeholder="Enter Host Name" required>
+                <label for="host_name" class="fw-light">Host Address</label>
+                <small id="host_nameHelp" class="form-text text-muted">The host address required to connect to MySQL database.</small>
+                <div class="invalid-feedback">
+                    Please choose the host address.
+                </div>
+            </div>
             <div class="form-group col-md-6 form-floating fs-6 has-validation">
 
                 <input type="text" class="form-control" id="username" name ="username" aria-describedby="usernameHelp" placeholder="Enter username" required>
