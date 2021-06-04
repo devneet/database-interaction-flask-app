@@ -161,9 +161,15 @@ class MongoDBOperations:
         collection_object = database_object[collectionName]
 
         if rowLimit == "" :
-            results = collection_object.find(conditionalQuery,projectionQuery)
+            if projectionQuery != {} :
+                results = collection_object.find(conditionalQuery,projectionQuery)
+            else :
+                results = collection_object.find(conditionalQuery)
         else :
-            results = collection_object.find(conditionalQuery,projectionQuery).limit(int(rowLimit))
+            if projectionQuery != {} :
+                results = collection_object.find(conditionalQuery,projectionQuery).limit(int(rowLimit))
+            else :
+                results = collection_object.find(conditionalQuery).limit(int(rowLimit))
 
         records = [i for i in results]
 
@@ -194,10 +200,10 @@ class MongoDBOperations:
         database_object = self.client[self.databaseName]
         collection_object = database_object[collectionName]
 
-        if conditionalQuery != "":
+        if conditionalQuery != {}:
 
             self.log_object.logToFile('debug',
-                                      'Searching for the document with the given conditional statement : ' + conditionalQuery)
+                                      'Searching for the document with the given conditional statement : ' + str(conditionalQuery))
 
             results = collection_object.find(conditionalQuery)
             count = len([i for i in results])
@@ -236,10 +242,10 @@ class MongoDBOperations:
         database_object = self.client[self.databaseName]
         collection_object = database_object[collectionName]
 
-        if conditionalQuery != "" :
+        if conditionalQuery != {} :
 
             self.log_object.logToFile('debug',
-                                      'Searching for the document with the given conditional statement : ' +conditionalQuery)
+                                      'Searching for the document with the given conditional statement : ' +str(conditionalQuery))
 
             results = collection_object.find(conditionalQuery)
             count = len([i for i in results])

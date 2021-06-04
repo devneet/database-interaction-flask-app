@@ -397,10 +397,6 @@ class CassandraOperations :
                     conditional_string += conditional_operator + value + \
                                           condition[3] + " "
 
-                elif condition[1].lower() == "not equals":
-                    conditional_operator = "<>"
-                    conditional_string += conditional_operator + value + \
-                                          condition[3] + " "
                 elif condition[1].lower() == "greater than":
                     conditional_operator = ">"
                     conditional_string += conditional_operator + value + \
@@ -521,10 +517,6 @@ class CassandraOperations :
 
                 if condition[1].lower() == "equals":
                     conditional_operator = "="
-                    conditional_string += conditional_operator + value + \
-                                          condition[3] + " "
-                elif condition[1].lower() == "not equals":
-                    conditional_operator = "<>"
                     conditional_string += conditional_operator + value + \
                                           condition[3] + " "
                 elif condition[1].lower() == "greater than":
@@ -688,24 +680,20 @@ class CassandraOperations :
                     conditional_operator = "="
                     conditional_string += conditional_operator + value +  \
                                           condition[3] + " "
-                elif condition[1].lower() == "not equals":
-                    conditional_operator = "<>"
-                    conditional_string += conditional_operator + value +  \
-                                          condition[3] + " "
                 elif condition[1].lower() == "greater than":
-                    conditional_operator = "<>"
+                    conditional_operator = ">"
                     conditional_string += conditional_operator + value +  \
                                           condition[3] + " "
                 elif condition[1].lower() == "greater than equals":
-                    conditional_operator = "<>"
+                    conditional_operator = ">="
                     conditional_string += conditional_operator + value +  \
                                           condition[3] + " "
                 elif condition[1].lower() == "less than":
-                    conditional_operator = "<>"
+                    conditional_operator = "<"
                     conditional_string += conditional_operator  + value +  \
                                           condition[3] + " "
                 elif condition[1].lower() == "less than equals":
-                    conditional_operator = "<>"
+                    conditional_operator = "<="
                     conditional_string += conditional_operator + value +  \
                                           condition[3] + " "
                 elif condition[1].lower() == "in":

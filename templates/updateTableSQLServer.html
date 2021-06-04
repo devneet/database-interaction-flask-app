@@ -6,7 +6,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/05cd9c4554.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 
 </head>
 <body>
@@ -14,7 +13,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
       <a class="navbar-brand" href="/">
-        <img src="{{ url_for('static', filename='/icons/cassandra.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="{{ url_for('static', filename='/icons/sql-server.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
       </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -25,19 +24,19 @@
           <a class="nav-link active" aria-current="page" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/dboperation/{{db_type}}/create_table_cassandra/">Create Table</a>
+          <a class="nav-link" href="/dboperation/{{db_type}}/create_table_sql_server/">Create Table</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_single_record_cassandra/">Insert Single Record</a>
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_single_record_sql_server/">Insert Single Record</a>
         </li>
           <li class="nav-item">
-          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_multiple_records_cassandra/">Bulk Insert</a>
+          <a class="nav-link" href="/dboperation/{{db_type}}/insert_table_multiple_records_sql_server/">Bulk Insert</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/dboperation/{{db_type}}/delete_from_table_cassandra/">Delete Record</a>
+          <a class="nav-link" href="/dboperation/{{db_type}}/delete_from_table_sql_server/">Delete Record</a>
         </li>
           <li class="nav-item">
-          <a class="nav-link" href="/dboperation/{{db_type}}/download_data_cassandra/">Download Records</a>
+          <a class="nav-link" href="/dboperation/{{db_type}}/download_data_sql_server/">Download Records</a>
         </li>
       </ul>
     </div>
@@ -48,67 +47,52 @@
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">Update Table Form - {{db_type}}</h1>
-            <p class="lead">The table updation form for Cassandra database.</p>
+            <p class="lead">The table updation form for Microsoft SQL Server database.</p>
         </div>
-
-        <div class="accordion accordion-flush" id="accordionExample">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Show Me - How To Use It !
-              </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                  <marquee>
-                    <strong>Please fill all the details given below. While selecting the file to upload, ensure that the proper zip file downloaded from correct keyspace name of the Data Astrix Cassandra cluster has been chosen. Alse, ensure that the keyspace already exists.</strong>
-                  </marquee>
-              </div>
-            </div>
-          </div>
-        </div>
-
     </div>
-       <p></p>
-    <form method="POST" action="/update_table_record_cassandra/" class="container row g-3 needs-validation" enctype = "multipart/form-data">
+    <form method="POST" action="/update_table_record_sql_server/" class="container row g-3 needs-validation">
+
+        <div class="form-group col-lg-12 form-floating fs-6 has-validation">
+
+                <input type="text" class="form-control" id="server_name" name ="server_name" aria-describedby="server_nameHelp" placeholder="Enter Server Name" required>
+                <label for="server_name" class="fw-light">Server Name</label>
+                <small id="host_nameHelp" class="form-text text-muted">The server name required to connect to Microsoft SQL Server database.</small>
+                <div class="invalid-feedback">
+                    Please choose the server name.
+                </div>
+            </div>
+
             <div class="form-group col-md-6 form-floating fs-6 has-validation">
 
-                <input type="text" class="form-control" id="clientId" name ="clientId" aria-describedby="clientIdHelp" placeholder="Enter Client ID" required>
-                <label for="clientId" class="fw-light">Client ID</label>
-                <small id="usernameHelp" class="form-text text-muted">The client ID required to connect to the Cassandra cloud cluster.</small>
+                <input type="text" class="form-control" id="username" name ="username" aria-describedby="usernameHelp" placeholder="Enter username">
+                <label for="username" class="fw-light">Username</label>
+                <small id="usernameHelp" class="form-text text-muted">The username required to connect to Microsoft SQL Server database.</small>
                 <div class="invalid-feedback">
-                    Please choose the client ID.
+                    Please choose the username.
                 </div>
             </div>
             <div class="form-group col-lg-6 form-floating fs-6 has-validation">
-                <input type="password" class="form-control" id="clientSecret" name ="clientSecret" placeholder="Enter Client Secret Key" aria-describedby="clientSecretHelp" required>
-                <label for="clientSecret" class="fw-light">Client Secret Key</label>
-                <small id="clientSecretHelp" class="form-text text-muted">The client secret key required to connect to Cassandra cloud cluster.</small>
+                <input type="password" class="form-control" id="password" name ="password" placeholder="Enter password" aria-describedby="passwordHelp">
+                <label for="password" class="fw-light">Password</label>
+                <small id="passwordHelp" class="form-text text-muted">The password required to connect to Microsoft SQL Server database.</small>
                 <div class="invalid-feedback">
-                    Please choose the Client Secret Key.
+                    Please choose the password.
                 </div>
             </div>
             <div class="form-group col-lg-6 form-floating fs-6 has-validation">
-                <input type="text" class="form-control" id="keySpaceName" name ="keySpaceName" aria-describedby="keySpaceNameHelp" placeholder="Enter Key Space Name" required>
-                <label for="keySpaceName" class="fw-light">Key Space</label>
-                <small id="keySpaceNameHelp" class="form-text text-muted">The keyspace name which has already been created in the Cassandra cloud cluster.</small>
+                <input type="text" class="form-control" id="dbName" name ="database_name" aria-describedby="dbNameHelp" placeholder="Enter database name" required>
+                <label for="dbName" class="fw-light">Database Name</label>
+                <small id="dbNameHelp" class="form-text text-muted">The Microsoft SQL Server database to connect to.</small>
                 <div class="invalid-feedback">
-                    Please choose the key space name.
+                    Please choose the database name.
                 </div>
             </div>
             <div class="form-group col-lg-6 form-floating fs-6 has-validation">
-                <input type="text" class="form-control" id="tableName" name="tableName" aria-describedby="tableNameHelp" placeholder="Enter table name" required>
+                <input type="text" class="form-control" id="tableName" name="table_name" aria-describedby="tableNameHelp" placeholder="Enter database name" required>
                 <label for="tableName" class="fw-light">Table Name</label>
-                <small id="tableNameHelp" class="form-text text-muted">The name of the table in which the record will be updated for Cassandra cloud cluster.</small>
+                <small id="tableNameHelp" class="form-text text-muted">The name of the table to in the Microsoft SQL Server database whose data needs to be modified.</small>
                 <div class="invalid-feedback">
                     Please choose the table name.
-                </div>
-            </div>
-        <div class="form-group col-lg-12 fs-6 has-validation">
-                <input type="file" class="form-control" id="connectionBundle" name ="connectionBundle" aria-describedby="connectionBundleHelp"  accept=".zip" required>
-                <small id="connectionBundleHelp" class="form-text text-muted">The file path of the secure cloud connection bundle zip file required to connect to Cassandra cloud cluster.</small>
-                <div class="invalid-feedback">
-                    Please choose the file path for the Secure Connection Bundle.
                 </div>
             </div>
 
@@ -195,7 +179,7 @@
                 html += '</div>';
 
                 html += '<div class="col-auto">';
-                html += '<select class="form-select" name ="fieldOperator'+count+'"><option value = "equals" selected>&#61;</option><option value = "greater than">&#62;</option><option value = "greater than equals">&#8925;</option><option value = "less than">&#60;</option><option value = "less than equals">&#8924;</option><option value = "in">in</option></select>';
+                html += '<select class="form-select" name ="fieldOperator'+count+'"><option value = "equals" selected>&#61;</option><option value = "not equals">&#8800;</option><option value = "greater than">&#62;</option><option value = "greater than equals">&#8925;</option><option value = "less than">&#60;</option><option value = "less than equals">&#8924;</option><option value = "like">like</option></select>';
                 html += '</div>';
 
                 html += '<div id= "fieldValuediv" class="col-auto">';
@@ -203,7 +187,7 @@
                 html += '</div></div>';
 
                 html += '<div class="col-auto">';
-                html += '<select class="form-select" id ="recordOperator'+count+'" name ="recordOperator'+count+'"><option value = "" selected>---</option><option value = "AND">AND</option></select>';
+                html += '<select class="form-select" id ="recordOperator'+count+'" name ="recordOperator'+count+'"><option value = "" selected>---</option><option value = "OR">OR</option><option value = "AND">AND</option></select>';
                 html += '</div>';
 
                 html += '<div id = "buttonDiv" class="col-auto">';

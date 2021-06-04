@@ -160,7 +160,7 @@ def table_download_data_mongodb():
             if conditionalQuery_data == False :
                 raise Exception("The conditional query provided is not in a proper JSON format.")
         else :
-            conditionalQuery_data = ""
+            conditionalQuery_data = {}
 
         if projectionQuery != "":
             projectionQuery_data = file_object.convertStringToJson(projectionQuery)
@@ -168,7 +168,7 @@ def table_download_data_mongodb():
             if projectionQuery_data == False:
                 raise Exception("The projection query provided is not in a proper JSON format.")
         else:
-            projectionQuery_data = ""
+            projectionQuery_data = {}
 
 
         table_object = MongoDBOperations(connection_uri,username,password,databaseName)
@@ -219,7 +219,7 @@ def table_delete_data_mongodb():
                 raise Exception("The conditional query provided is not in a proper JSON format.")
 
         else:
-            conditionalQuery_data = ""
+            conditionalQuery_data = {}
 
         table_object = MongoDBOperations(connection_uri,username,password,databaseName)
         table_object.delete_records(collectionName,conditionalQuery_data)
@@ -266,7 +266,7 @@ def table_update_schema_input_mongodb():
                 raise Exception("The conditional query provided is not in a proper JSON format.")
 
         else:
-            conditionalQuery_data = ""
+            conditionalQuery_data = {}
 
         dataToBeUpdatedData = file_object.convertStringToJson(dataToBeUpdated)
 
